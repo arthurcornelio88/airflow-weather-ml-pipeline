@@ -23,44 +23,143 @@ This project implements a comprehensive data pipeline that:
    - Schedule: Manual execution
    - Complete data processing and model training workflow
 
-## 🚀 Quick Start
+## 🚀 Installation & Setup
 
-### Prerequisites
-- Docker & Docker Compose
-- OpenWeatherMap API key
-- Python 3.8+
+### Step 1: Create Virtual Machine
 
-### Setup
+> **⚠️ Important**: Airflow requires significant resources. Use minimum **2 vCPU & 4GB RAM**
+
+**Option A: AWS EC2**
 ```bash
-# Clone the repository
-git clone <your-repo-url>
-cd airflow-weather-ml-pipeline
-
-# Copy environment template
-cp .env.example .env
-# Edit .env with your OpenWeatherMap API_KEY
-
-# Start Airflow
-cd airflow_dst
-docker-compose up -d
-
-# Access Airflow UI
-# http://localhost:8080 (admin/admin)
+# Launch Ubuntu 20.04/22.04 LTS instance
+# Minimum: t3.medium (2 vCPU, 4GB RAM)
+# Security Group: Open port 8080 for Airflow UI
 ```
 
+**Option B: Google Cloud Platform**
+```bash
+# Create Compute Engine instance
+# Machine type: e2-medium (2 vCPU, 4GB RAM)  
+# OS: Ubuntu 20.04/22.04 LTS
+# Firewall: Allow HTTP traffic on port 8080
+```
+
+**Option C: Local Ubuntu VM**
+- VirtualBox/VMware with Ubuntu 20.04+
+- Minimum 4GB RAM, 2 CPUs recommended
+
+### Step 2: Install Docker & Docker Compose
+
+```bash
+# Update system
+sudo apt update && sudo apt upgrade -y
+
+# Install Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker $USER
+
+# Install Docker Compose
+sudo apt install docker-compose -y
+
+# Reboot to apply group changes
+sudo reboot
+```
+
+### Step 3: Setup Airflow Environment
+
+```bash
+# Create working directory
+mkdir airflow_dst && cd airflow_dst
+
+# Download docker-compose configuration
+wget https://dst-de.s3.eu-west-3.amazonaws.com/airflow_fr/docker-compose/docker-compose.yaml
+
+# Create required directories
+mkdir ./dags ./logs ./plugins
+
+# Set permissions
+sudo chmod -R 777 logs/ dags/ plugins/
+
+# Create environment file
+echo -e "AIRFLOW_UID=$(id -u)\nAIRFLOW_GID=0" > .env
+```
+
+### Step 4: Initialize & Launch Airflow
+
+```bash
+# Initialize Airflow database
+docker-compose up airflow-init
+
+# Start all Airflow services (wait ~5 minutes)
+docker-compose up -d
+
+# Verify all containers are healthy
+docker container ls
+```
+
+### Step 5: Access Airflow UI
+
+- **URL**: `http://YOUR_VM_IP:8080`
+- **Login**: `airflow` / `airflow`
+- Wait for all containers to be "healthy" before accessing
+
+### Step 6: Download Airflow CLI Script
+
+```bash
+# Download utility script
+wget https://dst-de.s3.eu-west-3.amazonaws.com/airflow_avance_fr/docker-compose/airflow.sh
+chmod +x airflow.sh
+
+# Usage examples:
+./airflow.sh --help    # CLI commands
+./airflow.sh bash      # Shell access  
+./airflow.sh python    # Python shell
+```
+
+### Step 7: Deploy Project DAGs
+
+```bash
+# Clone this repository
+git clone https://github.com/arthurcornelio88/airflow-weather-ml-pipeline.git
+cd airflow-weather-ml-pipeline
+
+# Copy DAGs to Airflow
+cp -r dags/* /path/to/airflow_dst/dags/
+
+# Create data directories
+mkdir -p /path/to/airflow_dst/{raw_files,clean_data}
+```
+
+## ⚙️ Configuration & Usage
+
+### Configure API Access
+
+1. **Get OpenWeatherMap API Key**:
+   - Sign up at [OpenWeatherMap](https://openweathermap.org/api)
+   - Get your free API key
+
+2. **Set Airflow Variables** (via UI: Admin → Variables):
+   ```json
+   API_KEY: "your_openweathermap_api_key_here"
+   cities: ["paris", "london", "washington", "belo horizonte"]
+   ```
+
+### Run the Pipeline
+
+1. **Start Data Collection**:
+   - In Airflow UI, enable `weather_data_collection` DAG
+   - Let it run for ~15 minutes to collect sufficient data (15+ observations)
+
+2. **Train ML Models**:
+   - Manually trigger `weather_training_pipeline` DAG  
+   - Watch the complete pipeline: validation → transformation → parallel ML training → model selection
+
+3. **Monitor Execution**:
+   - Check logs in Airflow UI for detailed execution information
+   - Find trained models in `/clean_data/best_model.joblib`
+
 ### Usage
-1. **Configure Variables** in Airflow UI:
-   - `API_KEY`: Your OpenWeatherMap API key
-   - `cities`: JSON array like `["paris", "london", "washington", "belo horizonte"]`
-
-2. **Start Data Collection**:
-   - Enable `weather_data_collection` DAG
-   - Let it run for ~15 minutes to collect sufficient data
-
-3. **Train Models**:
-   - Manually trigger `weather_training_pipeline` DAG
-   - Watch the complete ML pipeline execute
-
 ## 🔧 Technical Features
 
 - **🎯 Task Decorators**: Modern Airflow 2.0+ syntax with `@dag` and `@task`
