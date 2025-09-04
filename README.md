@@ -2,6 +2,8 @@
 
 🌤️ **Complete weather data pipeline with machine learning model training using Apache Airflow 2.8.1**
 
+![Airflow pipeline](./docs/img/dag_2.png)
+
 ## 🎯 Project Overview
 
 This project implements a comprehensive data pipeline that:

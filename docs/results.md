@@ -163,7 +163,7 @@ def task_5_choose_best_model(data_paths: dict, lr_score: float, dt_score: float,
 - **Easier debugging**: Values visible in Airflow UI XCom
 - **Clean code**: Focus on business logic, not Airflow plumbing
 
-*[Airflow UI XCom screenshot to be inserted here showing transmitted values]*
+![Airflow UI XCom screenshot](./img/xcom_best_model.png)
 
 ### Final Model Selection (Task 5)
 
@@ -193,7 +193,9 @@ best_model_name = max(models, key=lambda name: models[name][1])
 3. **Retraining**: Model retrained on all data (120 samples)
 4. **Save**: Persistence with `joblib` in `/app/clean_data/`
 
-*[XCom UI + VS Code screenshot with saved model to be inserted]*
+![XCom UI screenshot with saved model](./img/task_5_xcom.png)
+
+![VS Code screenshot with saved model](./img/model_saved_in_app.png)
 
 ## 🎯 Remarkable Technical Points
 
