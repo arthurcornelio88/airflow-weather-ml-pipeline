@@ -1,0 +1,65 @@
+# ================================
+# CONFIGURATION SYSTÈME À IGNORER
+# ================================
+
+# Fichiers système Ubuntu/Linux  
+.*
+!.gitignore
+!.env.example
+
+# Logs système
+*.log
+
+# Editeurs et IDEs
+.vscode/
+.vscode-server/
+.idea/
+*.swp
+*.swo
+
+# ================================
+# PROJET AIRFLOW - CODE SOURCE
+# ================================
+
+# Python
+__pycache__/
+*.py[oc]
+*.pyo
+*.pyd
+*.so
+build/
+dist/
+wheels/
+*.egg-info
+.venv/
+
+# ================================  
+# AIRFLOW - RUNTIME À IGNORER
+# ================================
+
+# Données et exécution (générées automatiquement)
+airflow_dst/logs/
+airflow_dst/raw_files/
+airflow_dst/clean_data/
+
+# Configuration sensible
+airflow_dst/.env
+
+# Fichiers runtime Airflow
+airflow_dst/airflow.cfg
+airflow_dst/webserver_config.py
+airflow_dst/airflow.db
+airflow_dst/airflow-*.pid
+
+# Docker volumes
+airflow_dst/postgres-db-volume/
+
+# ================================
+# FICHIERS À CONSERVER (CODE SOURCE)
+# ================================
+# airflow_dst/dags/                 ✅ Code source DAGs
+# airflow_dst/docker-compose.yaml   ✅ Configuration Docker  
+# airflow_dst/.env.example          ✅ Template variables
+# airflow_dst/check_weather_data.sh ✅ Scripts utilitaires
+# docs/                             ✅ Documentation
+# README.md                         ✅ Documentation projet
